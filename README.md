@@ -1,7 +1,8 @@
 # MecDental
 
-## Mục tiêu
-# Phát triển một website hỗ trợ bệnh nhân đặt lịch khám trực tuyến và giúp phòng khám quản lý hoạt động hiệu quả. Hệ thống giảm tải thủ tục giấy tờ, tối ưu quy trình đặt lịch, quản lý hồ sơ bệnh nhân và tra cứu kết quả khám.
+# Mục tiêu
+
+Phát triển một website hỗ trợ bệnh nhân đặt lịch khám trực tuyến và giúp phòng khám quản lý hoạt động hiệu quả. Hệ thống giảm tải thủ tục giấy tờ, tối ưu quy trình đặt lịch, quản lý hồ sơ bệnh nhân và tra cứu kết quả khám.
 
  ## Đối tượng sử dụng
 
