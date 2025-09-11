@@ -24,4 +24,4 @@ Tính năng nhắc lịch qua email.
 
 Trang quản trị cho phòng khám theo dõi báo cáo: số ca khám, tỉ lệ đặt lịch, tình trạng phòng.
 
-Bảo mật dữ liệu bệnh nhân
+Bảo mật dữ liệu bệnh nhân.
