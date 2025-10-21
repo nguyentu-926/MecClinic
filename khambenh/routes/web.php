@@ -36,6 +36,23 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [PatientController::class, 'show'])->name('patients.show');
     Route::get('/profile/edit', [PatientController::class, 'edit'])->name('patients.edit');
     Route::put('/profile', [PatientController::class, 'update'])->name('patients.update');
+    // Bệnh nhân xem lịch hẹn
+Route::get('/patient/{id}/appointments', [PatientController::class, 'appointments'])
+    ->name('patient.appointments');
+// 📋 Tổng thể lịch hẹn
+Route::get('/patient/{id}/appointments/all', [AppointmentController::class, 'patientAllAppointments'])
+    ->name('patients.appointments.all');
+// Lịch đã duyệt
+Route::get('/patient/{id}/appointments/confirmed', [AppointmentController::class, 'patientConfirmedAppointments'])
+    ->name('patients.appointments.confirmed');
+
+// Lịch chờ duyệt
+Route::get('/patient/{id}/appointments/pending', [AppointmentController::class, 'patientPendingAppointments'])
+    ->name('patients.appointments.pending');
+
+// Lịch đã hủy
+Route::get('/patient/{id}/appointments/cancelled', [AppointmentController::class, 'patientCancelledAppointments'])
+    ->name('patients.appointments.cancelled');
 
     // =======================
     // DOCTOR
@@ -47,6 +64,9 @@ Route::middleware(['auth'])->group(function () {
     // Xem chi tiết 1 lịch hẹn
     Route::get('/doctor/appointments/{id}', [DoctorController::class, 'showAppointment'])
          ->name('doctor.appointment.show');
+     // Bác sĩ xem lịch hẹn
+Route::get('/doctor/{id}/appointments', [DoctorController::class, 'appointments'])
+    ->name('doctor.appointments');
     // Xem/Chỉnh sửa hồ sơ cá nhân bác sĩ
     Route::get('/doctor/profile/{id}', [DoctorController::class, 'editProfile'])
          ->name('doctor.profile.edit');
@@ -63,12 +83,21 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/doctor/appointments/{id}/medical-record', [DoctorController::class, 'storeMedicalRecord'])
          ->name('doctor.medicalRecord.store');
+    // ============ LỊCH HẸN CỦA BÁC SĨ ============
+    Route::get('/doctor/{id}/appointments/all', [AppointmentController::class, 'doctorAllAppointments'])->name('doctors.appointments.all');
+    Route::get('/doctor/{id}/appointments/confirmed', [AppointmentController::class, 'doctorConfirmedAppointments'])->name('doctors.appointments.confirmed');
+    Route::get('/doctor/{id}/appointments/pending', [AppointmentController::class, 'doctorPendingAppointments'])->name('doctors.appointments.pending');
+    Route::get('/doctor/{id}/appointments/cancelled', [AppointmentController::class, 'doctorCancelledAppointments'])->name('doctors.appointments.cancelled');
 
     // =======================
     // STAFF
     // =======================
     Route::get('/dashboard/staff/{id}', [StaffController::class, 'dashboard'])->name('dashboard.staff');
     // Danh sách lịch hẹn cho staff
+    
+    // Nhân viên xem toàn bộ lịch hẹn
+Route::get('/staff/appointments', [StaffController::class, 'appointments'])
+    ->name('staff.appointments');
     Route::get('staff/appointments', [AppointmentController::class,'staffIndex'])->name('staff.appointments.index');
 
     // Duyệt lịch hẹn (Ajax PUT)

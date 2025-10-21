@@ -218,6 +218,138 @@ public function destroy($id)
     // Redirect về lại trang trước (trang danh sách) với flash success
     return redirect()->back()->with('success','Duyệt lịch hẹn thành công');
 }
+public function patientConfirmedAppointments($id)
+{
+    // Lấy user hiện tại
+    $user = Auth::user();
+
+    // Kiểm tra: chỉ cho xem lịch của chính mình
+    if ($user->id != $id) {
+        abort(403, 'Bạn không có quyền truy cập trang này.');
+    }
+
+    $patient = $user->patient;
+
+    // Lấy các lịch hẹn đã duyệt của bệnh nhân
+    $confirmedAppointments = Appointment::with(['doctor.user'])
+        ->where('patient_id', $patient->id)
+        ->where('status', 'confirmed')
+         ->orderBy('appointment_date', 'asc')
+        ->get();
+
+    return view('patients.confirmed_appointments', compact('confirmedAppointments', 'patient'));
+}
+// 🕓 Lịch hẹn đang chờ duyệt
+public function patientPendingAppointments($id)
+{
+    $user = Auth::user();
+    if ($user->id != $id) abort(403, 'Không có quyền truy cập.');
+
+    $patient = $user->patient;
+
+    $pendingAppointments = Appointment::with(['doctor.user'])
+        ->where('patient_id', $patient->id)
+        ->where('status', 'pending')
+        ->orderBy('appointment_date', 'asc')
+        ->get();
+
+    return view('patients.pending_appointments', compact('pendingAppointments', 'patient'));
+}
+
+// ❌ Lịch hẹn đã hủy
+public function patientCancelledAppointments($id)
+{
+    $user = Auth::user();
+    if ($user->id != $id) abort(403, 'Không có quyền truy cập.');
+
+    $patient = $user->patient;
+
+    $cancelledAppointments = Appointment::with(['doctor.user'])
+        ->where('patient_id', $patient->id)
+        ->where('status', 'cancelled')
+        ->orderBy('appointment_date', 'asc')
+        ->get();
+
+    return view('patients.cancelled_appointments', compact('cancelledAppointments', 'patient'));
+}
+// 📋 Tổng thể tất cả lịch hẹn của bệnh nhân (lọc theo id đăng nhập)
+public function patientAllAppointments($id)
+{
+    $user = Auth::user();
+    if ($user->id != $id) {
+        abort(403, 'Không có quyền truy cập.');
+    }
+
+    $patient = $user->patient;
+
+    // Lấy tất cả lịch hẹn của bệnh nhân, sắp theo ngày gần nhất
+    $appointments = Appointment::with(['doctor.user'])
+        ->where('patient_id', $patient->id)
+        ->orderBy('appointment_date', 'asc')
+        ->get();
+
+    return view('patients.all_appointments', compact('appointments', 'patient'));
+}
+
+// Tổng thể lịch hẹn của bác sĩ
+public function doctorAllAppointments($id)
+{
+    $doctor = \App\Models\Doctor::where('user_id', $id)->firstOrFail();
+    $appointments = \App\Models\Appointment::with('patient.user')
+                    ->where('doctor_id', $doctor->id)
+                    ->orderBy('appointment_date', 'asc')
+                    ->get();
+
+    return view('doctors.all_appointments', compact('appointments', 'doctor'));
+}
+
+// Đã duyệt
+public function doctorConfirmedAppointments($id)
+{
+    $doctor = Doctor::where('user_id', $id)->first();
+
+    // Lấy các lịch hẹn đã xác nhận
+    $confirmAppointments = Appointment::where('doctor_id', $doctor->id)
+                                      ->where('status', 'confirmed')
+                                      ->orderBy('appointment_date', 'asc')
+                                      ->get();
+
+    // Truyền biến đúng tên cho view
+    return view('doctors.confirmed_appointments', compact('doctor', 'confirmAppointments'));
+}
+
+
+// Chờ duyệt
+public function doctorPendingAppointments($id)
+{
+    $doctor = Doctor::where('user_id', $id)->first();
+
+    // Lấy các lịch hẹn đang chờ duyệt
+    $pendingAppointments = Appointment::where('doctor_id', $doctor->id)
+                                      ->where('status', 'pending')
+                                      ->orderBy('appointment_date', 'asc')
+                                      ->get();
+
+    // Truyền biến cho view
+    return view('doctors.pending_appointments', compact('doctor', 'pendingAppointments'));
+}
+
+
+// Đã hủy
+public function doctorCancelledAppointments($id)
+{
+    $doctor = Doctor::where('user_id', $id)->first();
+
+    // Lấy các lịch hẹn đã hủy
+    $cancelledAppointments = Appointment::where('doctor_id', $doctor->id)
+                                        ->where('status', 'cancelled')
+                                        ->orderBy('appointment_date', 'asc')
+                                        ->get();
+
+    // Truyền biến cho view
+    return view('doctors.cancelled_appointments', compact('doctor', 'cancelledAppointments'));
+}
+
 
 
 

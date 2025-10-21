@@ -141,4 +141,91 @@ class DoctorController extends Controller
         return redirect()->route('dashboard.doctor', Auth::user()->id)
                          ->with('success','Thêm hồ sơ khám thành công!');
     }
+    public function appointments($id)
+{
+    $doctor = Auth::user()->doctor;
+
+    // Lấy các lịch hẹn theo bác sĩ đăng nhập
+    $confirmedAppointments = \App\Models\Appointment::with(['patient.user'])
+        ->where('doctor_id', $doctor->id)
+        ->where('status', 'confirmed')
+        ->orderByDesc('appointment_date')
+        ->get();
+
+    $pendingAppointments = \App\Models\Appointment::with(['patient.user'])
+        ->where('doctor_id', $doctor->id)
+        ->where('status', 'pending')
+        ->orderByDesc('appointment_date')
+        ->get();
+
+    return view('doctor.appointments', compact('confirmedAppointments', 'pendingAppointments'));
+}
+// ✅ Tổng thể lịch hẹn của bác sĩ
+public function doctorAllAppointments($id)
+{
+    $user = Auth::user();
+    if ($user->id != $id) abort(403, 'Không có quyền truy cập.');
+
+    $doctor = $user->doctor;
+
+    $appointments = Appointment::with(['patient.user'])
+        ->where('doctor_id', $doctor->id)
+        ->orderBy('appointment_date', 'asc')
+        ->get();
+
+    return view('doctors.all_appointments', compact('appointments', 'doctor'));
+}
+
+// ✅ Lịch hẹn đã duyệt
+public function doctorConfirmedAppointments($id)
+{
+    $user = Auth::user();
+    if ($user->id != $id) abort(403, 'Không có quyền truy cập.');
+
+    $doctor = $user->doctor;
+
+    $confirmedAppointments = Appointment::with(['patient.user'])
+        ->where('doctor_id', $doctor->id)
+        ->where('status', 'confirmed')
+        ->orderBy('appointment_date', 'asc')
+        ->get();
+
+    return view('doctors.confirmed_appointments', compact('confirmedAppointments', 'doctor'));
+}
+
+// ✅ Lịch hẹn chờ duyệt
+public function doctorPendingAppointments($id)
+{
+    $user = Auth::user();
+    if ($user->id != $id) abort(403, 'Không có quyền truy cập.');
+
+    $doctor = $user->doctor;
+
+    $pendingAppointments = Appointment::with(['patient.user'])
+        ->where('doctor_id', $doctor->id)
+        ->where('status', 'pending')
+        ->orderBy('appointment_date', 'asc')
+        ->get();
+
+    return view('doctors.pending_appointments', compact('pendingAppointments', 'doctor'));
+}
+
+// ✅ Lịch hẹn đã hủy
+public function doctorCancelledAppointments($id)
+{
+    $user = Auth::user();
+    if ($user->id != $id) abort(403, 'Không có quyền truy cập.');
+
+    $doctor = $user->doctor;
+
+    $cancelledAppointments = Appointment::with(['patient.user'])
+        ->where('doctor_id', $doctor->id)
+        ->where('status', 'cancelled')
+        ->orderBy('appointment_date', 'asc')
+        ->get();
+
+    return view('doctors.cancelled_appointments', compact('cancelledAppointments', 'doctor'));
+}
+
+
 }

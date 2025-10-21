@@ -88,7 +88,7 @@
         <a href="#chuyenkhoa" class="uppercase font-semibold text-lg hover:text-[#6bb9ee] transition">Chuyên khoa</a>
         <a href="#chuyengia" class="uppercase font-semibold text-lg hover:text-[#6bb9ee] transition">Chuyên gia – bác sĩ</a>
         <a href="#" class="uppercase font-semibold text-lg hover:text-[#6bb9ee] transition">Dịch vụ đặc biệt</a>
-        <a href="#" class="uppercase font-semibold text-lg hover:text-[#6bb9ee] transition">Lịch hẹn</a>
+        <a href="{{ route('appointments.index') }}" class="uppercase font-semibold text-lg hover:text-[#6bb9ee] transition">Lịch hẹn</a>
         <a href="#" class="uppercase font-semibold text-lg hover:text-[#6bb9ee] transition">Kết quả khám</a>
         <a href="{{ route('patients.show') }}"
    class="uppercase font-semibold text-lg hover:text-[#6bb9ee] transition">

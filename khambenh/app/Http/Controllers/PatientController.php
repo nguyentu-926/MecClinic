@@ -72,4 +72,24 @@ class PatientController extends Controller
         return redirect()->route('patients.show')
                          ->with('success', 'Cập nhật hồ sơ cá nhân thành công!');
     }
+    public function appointments($id)
+{
+    $patient = Auth::user()->patient;
+
+    // Lấy lịch hẹn của bệnh nhân hiện tại
+    $confirmedAppointments = \App\Models\Appointment::with(['doctor.user'])
+        ->where('patient_id', $patient->id)
+        ->where('status', 'confirmed')
+        ->orderByDesc('appointment_date')
+        ->get();
+
+    $pendingAppointments = \App\Models\Appointment::with(['doctor.user'])
+        ->where('patient_id', $patient->id)
+        ->where('status', 'pending')
+        ->orderByDesc('appointment_date')
+        ->get();
+
+    return view('patient.appointments', compact('confirmedAppointments', 'pendingAppointments'));
+}
+
 }

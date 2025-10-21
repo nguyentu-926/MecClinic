@@ -12,34 +12,59 @@ use Illuminate\Support\Facades\Auth;
 class StaffController extends Controller
 {
     public function dashboard($id)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        // Kiểm tra quyền
-        if ($user->id != $id || $user->role !== 'staff') {
-            abort(403, 'Không có quyền truy cập');
-        }
-
-        // Lấy thông tin staff
-        $staff = Staff::where('user_id', $id)->first();
-
-        // Lấy dữ liệu hiển thị
-        $appointments = Appointment::latest()->take(5)->get();
-
-        return view('dashboard.staff', compact('user', 'staff', 'appointments'));
+    if ($user->id != $id || $user->role !== 'staff') {
+        abort(403, 'Không có quyền truy cập');
     }
+
+    $staff = Staff::where('user_id', $id)->first();
+
+    $confirmedAppointments = Appointment::with(['patient.user', 'doctor.user'])
+        ->where('status', 'confirmed')
+        ->orderBy('appointment_date', 'desc')
+        ->take(50)
+        ->get();
+
+    $pendingAppointments = Appointment::with(['patient.user', 'doctor.user'])
+        ->where('status', 'pending')
+        ->orderBy('appointment_date', 'desc')
+        ->take(50)
+        ->get();
+
+    $cancelledAppointments = Appointment::with(['patient.user', 'doctor.user'])
+        ->where('status', 'cancelled')
+        ->orderBy('appointment_date', 'desc')
+        ->take(50)
+        ->get();
+
+    return view('dashboard.staff', compact(
+        'user',
+        'staff',
+        'confirmedAppointments',
+        'pendingAppointments',
+        'cancelledAppointments'
+    ));
+}
+
      // Xem tất cả lịch chờ duyệt
-    public function appointments()
-    {
-        $appointments = Appointment::with(['patient.user', 'doctor.user', 'doctor.specialization'])
-            ->where('status', 'pending')
-            ->with('doctor.user', 'doctor.specialization')
-            ->orderBy('appointment_date')
-            ->orderBy('appointment_time')
-            ->get();
+   public function appointments()
+{
+    // Nhân viên được xem toàn bộ (hoặc lọc tùy mục đích)
+    $confirmedAppointments = \App\Models\Appointment::with(['doctor.user', 'patient.user'])
+        ->where('status', 'confirmed')
+        ->orderByDesc('appointment_date')
+        ->get();
 
-        return view('staff.appointments.index', compact('appointments'));
-    }
+    $pendingAppointments = \App\Models\Appointment::with(['doctor.user', 'patient.user'])
+        ->where('status', 'pending')
+        ->orderByDesc('appointment_date')
+        ->get();
+
+    return view('staff.appointments', compact('confirmedAppointments', 'pendingAppointments'));
+}
+
 
 public function approveAppointment($id)
 {
@@ -99,6 +124,9 @@ public function index()
         ->get(); 
 
     return view('staff.appointments', compact('appointments'));
+
+
+    
 }
 
 
