@@ -1,4 +1,4 @@
-# MecDental
+# MecClinic
 
 # Mục tiêu
 
